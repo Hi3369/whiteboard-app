@@ -51,6 +51,7 @@ Frontend (React)     WebSocket API Gateway     Lambda Functions
 5. **🗑️ Clear Canvas**: Click the clear button to reset the entire whiteboard for all users
 6. **👥 Multi-user**: Share the URL with others for real-time collaborative drawing
 7. **🔄 Persistent Canvas**: Your drawings automatically save and sync across all connected users
+8. **📊 Live User Count**: See real-time count of connected users in the top-right corner
 
 ## 🔧 Local Development
 
@@ -134,5 +135,14 @@ This project is open source and available under the [MIT License](LICENSE).
 - CDK Stack: `WhiteboardInfrastructureStack`
 - WebSocket API: API Gateway + Lambda
 - Database: DynamoDB (`whiteboard-connections`)
+- Error Handling: 完全なWebSocket接続エラー処理実装済み
+- Connection Management: 自動スケール接続クリーンアップシステム
+
+**Technical Improvements**:
+- ✅ WebSocket API Gatewayとの完全互換性
+- ✅ 堅牢なエラーハンドリングとリカバリー
+- ✅ リアルタイムユーザー数同期
+- ✅ Canvas最適化 (willReadFrequently)
+- ✅ モバイルタッチサポート
 
 **Note**: このリポジトリはフロントエンドクライアントです。バックエンドインフラはAWS CDKで別途デプロイされています。
