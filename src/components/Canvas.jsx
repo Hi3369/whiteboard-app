@@ -93,7 +93,7 @@ const Canvas = forwardRef(({ tool, color, strokeWidth, onDraw }, ref) => {
 
   useEffect(() => {
     const canvas = canvasRef.current
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })
     ctx.lineCap = 'round'
     ctx.lineJoin = 'round'
     ctxRef.current = ctx

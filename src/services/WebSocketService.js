@@ -74,6 +74,10 @@ class WebSocketService {
       case 'clear':
         this.callbacks.onDrawData?.({ type: 'clear' })
         break
+      case 'ping':
+        // サーバーからのpingメッセージ（接続テスト用）- 特に処理不要
+        console.log('Received ping from server')
+        break
       default:
         console.log('Unknown message type:', data.type)
     }
