@@ -18,14 +18,21 @@ class WebSocketService {
 
   connect() {
     try {
-      const wsUrl = process.env.NODE_ENV === 'production' 
+      // GitHub Pagesで確実にプロダクション環境を検出
+      const isProduction = window.location.hostname === 'hi3369.github.io' || 
+                          window.location.protocol === 'https:' ||
+                          process.env.NODE_ENV === 'production'
+      
+      const wsUrl = isProduction
         ? 'wss://h16tuvno9d.execute-api.ap-northeast-3.amazonaws.com/prod'
         : 'ws://localhost:8080'
+      
+      console.log('Connecting to WebSocket:', wsUrl, 'isProduction:', isProduction)
       
       this.ws = new WebSocket(wsUrl)
       
       this.ws.onopen = () => {
-        console.log('WebSocket connected')
+        console.log('WebSocket connected successfully to:', wsUrl)
         this.isConnected = true
         this.reconnectAttempts = 0
         this.callbacks.onConnect?.()
@@ -48,7 +55,7 @@ class WebSocketService {
       }
       
       this.ws.onerror = (error) => {
-        console.error('WebSocket error:', error)
+        console.error('WebSocket error connecting to:', wsUrl, error)
       }
     } catch (error) {
       console.error('Failed to connect to WebSocket:', error)
