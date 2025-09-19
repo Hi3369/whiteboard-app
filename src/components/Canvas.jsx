@@ -5,18 +5,37 @@ const Canvas = forwardRef(({ tool, color, strokeWidth, onDraw }, ref) => {
   const ctxRef = useRef(null)
   const [isDrawing, setIsDrawing] = useState(false)
   const [currentPath, setCurrentPath] = useState([])
+  const [drawingHistory, setDrawingHistory] = useState([])
 
   useImperativeHandle(ref, () => ({
     drawFromRemote: (drawData) => {
       const ctx = ctxRef.current
       if (!ctx) return
 
-      ctx.strokeStyle = drawData.color
-      ctx.lineWidth = drawData.strokeWidth
-      ctx.lineCap = 'round'
-      ctx.lineJoin = 'round'
+      if (drawData.type === 'clear') {
+        const canvas = canvasRef.current
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        setDrawingHistory([])
+        return
+      }
+
+      // リモートの描画をhistoryに追加
+      setDrawingHistory(prev => [...prev, drawData])
 
       if (drawData.type === 'path' && drawData.points.length > 1) {
+        ctx.save()
+        
+        if (drawData.tool === 'eraser') {
+          ctx.globalCompositeOperation = 'destination-out'
+        } else {
+          ctx.globalCompositeOperation = 'source-over'
+          ctx.strokeStyle = drawData.color
+        }
+        
+        ctx.lineWidth = drawData.strokeWidth
+        ctx.lineCap = 'round'
+        ctx.lineJoin = 'round'
+        
         ctx.beginPath()
         ctx.moveTo(drawData.points[0].x, drawData.points[0].y)
         
@@ -25,6 +44,7 @@ const Canvas = forwardRef(({ tool, color, strokeWidth, onDraw }, ref) => {
         }
         
         ctx.stroke()
+        ctx.restore()
       }
     },
     clear: () => {
@@ -32,7 +52,42 @@ const Canvas = forwardRef(({ tool, color, strokeWidth, onDraw }, ref) => {
       const canvas = canvasRef.current
       if (ctx && canvas) {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
+        setDrawingHistory([])
       }
+    },
+    redrawAll: () => {
+      const ctx = ctxRef.current
+      const canvas = canvasRef.current
+      if (!ctx || !canvas) return
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      
+      drawingHistory.forEach(drawData => {
+        if (drawData.type === 'path' && drawData.points.length > 1) {
+          ctx.save()
+          
+          if (drawData.tool === 'eraser') {
+            ctx.globalCompositeOperation = 'destination-out'
+          } else {
+            ctx.globalCompositeOperation = 'source-over'
+            ctx.strokeStyle = drawData.color
+          }
+          
+          ctx.lineWidth = drawData.strokeWidth
+          ctx.lineCap = 'round'
+          ctx.lineJoin = 'round'
+          
+          ctx.beginPath()
+          ctx.moveTo(drawData.points[0].x, drawData.points[0].y)
+          
+          for (let i = 1; i < drawData.points.length; i++) {
+            ctx.lineTo(drawData.points[i].x, drawData.points[i].y)
+          }
+          
+          ctx.stroke()
+          ctx.restore()
+        }
+      })
     }
   }))
 
@@ -44,10 +99,17 @@ const Canvas = forwardRef(({ tool, color, strokeWidth, onDraw }, ref) => {
     ctxRef.current = ctx
 
     const resizeCanvas = () => {
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
       ctx.lineCap = 'round'
       ctx.lineJoin = 'round'
+      
+      // 画像をリサイズ後のキャンバスに復元
+      if (imageData && drawingHistory.length > 0) {
+        // 履歴から再描画
+        ref.current?.redrawAll()
+      }
     }
 
     resizeCanvas()
@@ -56,10 +118,10 @@ const Canvas = forwardRef(({ tool, color, strokeWidth, onDraw }, ref) => {
     return () => {
       window.removeEventListener('resize', resizeCanvas)
     }
-  }, [])
+  }, [drawingHistory])
 
   const startDrawing = (e) => {
-    if (tool !== 'pen') return
+    if (tool !== 'pen' && tool !== 'eraser') return
     
     setIsDrawing(true)
     const rect = canvasRef.current.getBoundingClientRect()
@@ -69,14 +131,24 @@ const Canvas = forwardRef(({ tool, color, strokeWidth, onDraw }, ref) => {
     setCurrentPath([{ x, y }])
     
     const ctx = ctxRef.current
-    ctx.strokeStyle = color
+    ctx.save()
+    
+    if (tool === 'eraser') {
+      ctx.globalCompositeOperation = 'destination-out'
+    } else {
+      ctx.globalCompositeOperation = 'source-over'
+      ctx.strokeStyle = color
+    }
+    
     ctx.lineWidth = strokeWidth
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
     ctx.beginPath()
     ctx.moveTo(x, y)
   }
 
   const draw = (e) => {
-    if (!isDrawing || tool !== 'pen') return
+    if (!isDrawing || (tool !== 'pen' && tool !== 'eraser')) return
     
     const rect = canvasRef.current.getBoundingClientRect()
     const x = e.clientX - rect.left
@@ -94,6 +166,8 @@ const Canvas = forwardRef(({ tool, color, strokeWidth, onDraw }, ref) => {
     if (!isDrawing) return
     
     setIsDrawing(false)
+    const ctx = ctxRef.current
+    ctx.restore()
     
     if (currentPath.length > 1) {
       const drawData = {
@@ -101,8 +175,13 @@ const Canvas = forwardRef(({ tool, color, strokeWidth, onDraw }, ref) => {
         points: currentPath,
         color: color,
         strokeWidth: strokeWidth,
+        tool: tool,
         timestamp: Date.now()
       }
+      
+      // 自分の描画もhistoryに追加
+      setDrawingHistory(prev => [...prev, drawData])
+      
       onDraw(drawData)
     }
     
@@ -138,6 +217,7 @@ const Canvas = forwardRef(({ tool, color, strokeWidth, onDraw }, ref) => {
   return (
     <canvas
       ref={canvasRef}
+      className={tool === 'eraser' ? 'eraser' : ''}
       onMouseDown={startDrawing}
       onMouseMove={draw}
       onMouseUp={stopDrawing}
