@@ -64,6 +64,18 @@ class WebSocketService {
   }
 
   handleMessage(data) {
+    // データの形式を確認
+    if (!data || typeof data !== 'object') {
+      console.warn('Invalid message format received:', data)
+      return
+    }
+
+    // typeが未定義の場合のデバッグ情報
+    if (data.type === undefined) {
+      console.warn('Message with undefined type received:', JSON.stringify(data))
+      return
+    }
+
     switch (data.type) {
       case 'userCount':
         this.callbacks.onUserCountUpdate?.(data.count)
@@ -79,7 +91,7 @@ class WebSocketService {
         console.log('Received ping from server')
         break
       default:
-        console.log('Unknown message type:', data.type)
+        console.log('Unknown message type:', data.type, 'Full message:', JSON.stringify(data))
     }
   }
 
