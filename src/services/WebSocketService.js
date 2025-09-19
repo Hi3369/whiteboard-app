@@ -109,21 +109,31 @@ class WebSocketService {
   }
 
   sendDrawData(drawData) {
+    console.log('sendDrawData called - isConnected:', this.isConnected, 'readyState:', this.ws?.readyState)
     if (this.isConnected && this.ws.readyState === WebSocket.OPEN) {
       const message = {
         action: 'draw',
         drawData: drawData
       }
+      console.log('Sending draw message:', message)
       this.ws.send(JSON.stringify(message))
+      console.log('Draw message sent successfully')
+    } else {
+      console.log('Cannot send draw message - WebSocket not ready')
     }
   }
 
   sendClearCanvas() {
+    console.log('sendClearCanvas called - isConnected:', this.isConnected, 'readyState:', this.ws?.readyState)
     if (this.isConnected && this.ws.readyState === WebSocket.OPEN) {
       const message = {
         action: 'clear'
       }
+      console.log('Sending clear message:', message)
       this.ws.send(JSON.stringify(message))
+      console.log('Clear message sent successfully')
+    } else {
+      console.log('Cannot send clear message - WebSocket not ready')
     }
   }
 
