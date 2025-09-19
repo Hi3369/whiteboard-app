@@ -5,11 +5,14 @@ A real-time collaborative whiteboard application built with React and AWS WebSoc
 ## 🎨 Features
 
 - **Real-time Drawing**: Draw collaboratively with multiple users in real-time
-- **Pen Tool**: Adjustable color and stroke width
+- **Pen Tool**: Adjustable color and stroke width (1-20px)
+- **🧽 Eraser Tool**: Remove drawings with adjustable eraser size (1-50px)
+- **🖼️ Persistent Canvas**: Drawings remain visible across browser sessions and resizes
 - **Clear Canvas**: Clear the entire whiteboard for all users
 - **Responsive Design**: Works on desktop and mobile devices
 - **Touch Support**: Native touch support for mobile drawing
 - **Live User Count**: See how many users are currently connected
+- **🎨 Dynamic Cursors**: Visual feedback with tool-specific cursors
 
 ## 🛠️ Tech Stack
 
@@ -41,11 +44,13 @@ Frontend (React)     WebSocket API Gateway     Lambda Functions
 
 ## 🎯 Usage
 
-1. **Drawing**: Click and drag to draw on the canvas
-2. **Color Selection**: Click the color picker to change pen color
-3. **Stroke Width**: Use the slider to adjust line thickness
-4. **Clear Canvas**: Click the clear button to reset the whiteboard
-5. **Multi-user**: Share the URL with others for collaborative drawing
+1. **✏️ Drawing**: Select pen tool, choose color, and click & drag to draw on the canvas
+2. **🧽 Erasing**: Select eraser tool and drag over areas to remove drawings
+3. **🎨 Color Selection**: Click the color picker to change pen color (disabled during eraser mode)
+4. **📏 Tool Size**: Use the slider to adjust pen thickness (1-20px) or eraser size (1-50px)
+5. **🗑️ Clear Canvas**: Click the clear button to reset the entire whiteboard for all users
+6. **👥 Multi-user**: Share the URL with others for real-time collaborative drawing
+7. **🔄 Persistent Canvas**: Your drawings automatically save and sync across all connected users
 
 ## 🔧 Local Development
 
