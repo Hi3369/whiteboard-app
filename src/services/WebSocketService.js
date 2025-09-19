@@ -24,7 +24,7 @@ class WebSocketService {
                           process.env.NODE_ENV === 'production'
       
       const wsUrl = isProduction
-        ? 'wss://h16tuvno9d.execute-api.ap-northeast-3.amazonaws.com/prod'
+        ? 'wss://jek80nenf0.execute-api.ap-northeast-3.amazonaws.com/prod'
         : 'ws://localhost:8080'
       
       console.log('Connecting to WebSocket:', wsUrl, 'isProduction:', isProduction)
