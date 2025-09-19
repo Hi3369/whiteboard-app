@@ -23,7 +23,9 @@ A real-time collaborative whiteboard application built with React and AWS WebSoc
 
 ## 🚀 Live Demo
 
-Visit the live application: [https://your-username.github.io/whiteboard-app/](https://your-username.github.io/whiteboard-app/)
+**✅ ライブアプリケーション**: [https://hi3369.github.io/whiteboard-app/](https://hi3369.github.io/whiteboard-app/)
+
+複数のブラウザタブで開いて、リアルタイム描画機能をお試しください！
 
 ## 🏗️ Architecture
 
@@ -56,7 +58,7 @@ Frontend (React)     WebSocket API Gateway     Lambda Functions
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/your-username/whiteboard-app.git
+git clone https://github.com/Hi3369/whiteboard-app.git
 cd whiteboard-app
 ```
 
@@ -81,7 +83,11 @@ npm run dev
 
 ## 🌐 WebSocket Connection
 
-The app connects to AWS WebSocket API Gateway for real-time communication. In development mode, it attempts to connect to `ws://localhost:8080` for local testing.
+The app connects to AWS WebSocket API Gateway for real-time communication:
+- **Production**: `wss://h16tuvno9d.execute-api.ap-northeast-3.amazonaws.com/prod`
+- **Development**: `ws://localhost:8080`
+
+WebSocket URL is automatically selected based on `NODE_ENV` environment variable.
 
 ## 📱 Mobile Support
 
@@ -110,4 +116,18 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-**Note**: This is the frontend client. The backend infrastructure is deployed separately on AWS using Lambda functions and API Gateway.
+## 🔧 Deployment Information
+
+**GitHub Actions**: 自動デプロイ設定済み
+- ワークフロー: `.github/workflows/deploy.yml`
+- トリガー: `main` ブランチへの push
+- 重要な設定変更:
+  - `npm ci` → `npm install` (package-lock.json不要)
+  - npmキャッシュ無効化
+
+**AWS Infrastructure**: 
+- CDK Stack: `WhiteboardInfrastructureStack`
+- WebSocket API: API Gateway + Lambda
+- Database: DynamoDB (`whiteboard-connections`)
+
+**Note**: このリポジトリはフロントエンドクライアントです。バックエンドインフラはAWS CDKで別途デプロイされています。

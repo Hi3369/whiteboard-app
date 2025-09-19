@@ -1,3 +1,12 @@
+# GitHub Pages デプロイワークフロー
+# 
+# 修正履歴:
+# - npm ci → npm install に変更 (package-lock.json が存在しないため)
+# - npmキャッシュを無効化 (cache-dependency-path エラーの解決)
+# - GitHub Pages を有効化し build_type を workflow に設定
+#
+# デプロイURL: https://hi3369.github.io/whiteboard-app/
+
 name: Deploy to GitHub Pages
 
 on:
@@ -27,8 +36,12 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
+        # Note: npmキャッシュは無効化（package-lock.jsonが存在しないため）
+        # cache: 'npm'
+        # cache-dependency-path: package-lock.json
         
     - name: Install dependencies
+      # Note: npm ci から npm install に変更（package-lock.jsonが不要）
       run: npm install
         
     - name: Build
