@@ -36,6 +36,11 @@ class WebSocketService {
         this.isConnected = true
         this.reconnectAttempts = 0
         this.callbacks.onConnect?.()
+        
+        // 接続成功後、既存描画をリクエスト
+        setTimeout(() => {
+          this.requestExistingDrawings()
+        }, 500)
       }
       
       this.ws.onmessage = (event) => {
@@ -134,6 +139,20 @@ class WebSocketService {
       console.log('Clear message sent successfully')
     } else {
       console.log('Cannot send clear message - WebSocket not ready')
+    }
+  }
+
+  requestExistingDrawings() {
+    console.log('requestExistingDrawings called - isConnected:', this.isConnected, 'readyState:', this.ws?.readyState)
+    if (this.isConnected && this.ws.readyState === WebSocket.OPEN) {
+      const message = {
+        action: 'getExistingDrawings'
+      }
+      console.log('Requesting existing drawings:', message)
+      this.ws.send(JSON.stringify(message))
+      console.log('Existing drawings request sent successfully')
+    } else {
+      console.log('Cannot request existing drawings - WebSocket not ready')
     }
   }
 
