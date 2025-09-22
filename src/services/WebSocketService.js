@@ -37,9 +37,10 @@ class WebSocketService {
         this.reconnectAttempts = 0
         this.callbacks.onConnect?.()
         
-        // 接続成功後、既存描画をリクエスト
+        // 接続成功後、既存描画とユーザー数をリクエスト
         setTimeout(() => {
           this.requestExistingDrawings()
+          this.requestUserCount()
         }, 500)
       }
       
@@ -156,6 +157,20 @@ class WebSocketService {
       console.log('Existing drawings request sent successfully')
     } else {
       console.log('Cannot request existing drawings - WebSocket not ready')
+    }
+  }
+
+  requestUserCount() {
+    console.log('requestUserCount called - isConnected:', this.isConnected, 'readyState:', this.ws?.readyState)
+    if (this.isConnected && this.ws.readyState === WebSocket.OPEN) {
+      const message = {
+        action: 'getUserCount'
+      }
+      console.log('Requesting user count:', message)
+      this.ws.send(JSON.stringify(message))
+      console.log('User count request sent successfully')
+    } else {
+      console.log('Cannot request user count - WebSocket not ready')
     }
   }
 
