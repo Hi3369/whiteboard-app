@@ -69,6 +69,9 @@ class WebSocketService {
   }
 
   handleMessage(data) {
+    // すべての受信メッセージをログ出力
+    console.log('WebSocket message received:', JSON.stringify(data))
+    
     // データの形式を確認
     if (!data || typeof data !== 'object') {
       console.warn('Invalid message format received:', data)
